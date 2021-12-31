@@ -1,0 +1,137 @@
+<html>
+<head>
+<title>Make 10 from 4 numbers</title>
+
+</head>
+<body>
+  <h1>Make 10 from 4 numbers</h1>
+  num1: <input name="num1" id="num1" type="text" /><br>
+  num2: <input name="num2" id="num2" type="text" /><br>
+  num3: <input name="num3" id="num3" type="text" /><br>
+  num4: <input name="num4" id="num4" type="text" /><br>
+  <br>
+  result: <span id="result"></span>
+  <br>
+  <br>
+  <button type="button" id="calc">calc</button>
+</body>
+
+<script type="text/javascript">
+  var button = document.getElementById("calc");
+  button.onclick = function(){
+    document.getElementById("result").innerHTML="";
+    var num1 = Number(document.getElementById("num1").value);
+    var num2 = Number(document.getElementById("num2").value);
+    var num3 = Number(document.getElementById("num3").value);
+    var num4 = Number(document.getElementById("num4").value);
+    var arrays = permutation([num1,num2,num3,num4]);
+    document.getElementById("result").innerHTML="Can't make 10 from these numbers";
+    for(var i = 0 ; i < arrays.length ; i++){
+      var nums = arrays[i];
+      var result = test_pattern(nums);
+      if(result != null){
+        document.getElementById("result").innerHTML=result;
+        break;
+      }
+    }
+  }
+
+  const test_pattern= (nums) => {
+    for(var i = 0; i < 4; i++){
+      for(var j = 0; j < 4; j++){
+        for(var k = 0; k < 4; k++){
+          for(var p = 0; p < 5; p++){
+            switch(p){
+              case 0://123
+                tmp = calc(calc(calc(nums[0], nums[1], i), nums[2], j), nums[3], k);
+                break;
+              case 1://132
+                tmp = calc(calc(nums[0], nums[1], i), calc(nums[2], nums[3], k),  j);
+                break;
+              case 2://213
+                tmp = calc(calc(nums[0], calc(nums[1], nums[2], j), i), nums[3], k);
+                break;
+              case 3://312
+                tmp = calc(nums[0], calc(calc(nums[1], nums[2], j), nums[3], k), i);
+                break;
+              case 4://321
+                tmp = calc(nums[0], calc(nums[1], calc(nums[2], nums[3], k), j), i);
+                break;
+            }
+            if(tmp == 10){
+              return createAns(nums,[i,j,k], p);
+            }
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  const createAns = (nums, pattern, p) => {
+    var operator = ["","",""]
+    for(var i = 0; i < 3; i++){
+      switch(pattern[i]){
+        case 0:
+          operator[i]='+';
+          break;
+        case 1:
+          operator[i]='-';
+          break;
+        case 2:
+          operator[i]='*';
+          break;
+        case 3:
+          operator[i]='/';
+          break;
+      }
+    }
+    switch(p){
+      case 0://123
+        return "(("+nums[0]+operator[0]+nums[1]+")"+operator[1]+nums[2]+")"+operator[2]+nums[3];
+      case 1://132
+        return "("+nums[0]+operator[0]+nums[1]+")"+operator[1]+"("+nums[2]+operator[2]+nums[3]+")";
+      case 2://213
+        return "("+nums[0]+operator[0]+"("+nums[1]+operator[1]+nums[2]+"))"+operator[2]+nums[3];
+      case 3://312
+        return nums[0]+operator[0]+"(("+nums[1]+operator[1]+nums[2]+")"+operator[2]+nums[3]+")";
+      case 4://321
+        return nums[0]+operator[0]+"("+nums[1]+operator[1]+"("+nums[2]+operator[2]+nums[3]+"))";
+    }
+  }
+
+  const calc = (a,b, pattern) => {
+    switch (pattern ){
+      case 0:
+        return a+b;
+      case 1:
+        return a-b;
+      case 2:
+        return a*b;
+      case 3:
+        return a/b
+      default:
+        return null;
+    }
+  };
+
+  const permutation = (array) => {
+    let result = [];
+    if (array.length === 1) {
+      result.push(array);
+      return result;
+    }
+    for (let i = 0; i < array.length; i++) {
+      const firstElem = array.slice(i, i + 1);
+      const restElem = [
+        ...array.slice(0, i),
+        ...array.slice(i + 1),
+      ];
+      let innerPermutations = permutation(restElem);
+      for (let j = 0; j < innerPermutations.length; j++) {
+        result.push([...firstElem, ...innerPermutations[j]]);
+      }
+    }
+    return result;
+  };
+</script>
